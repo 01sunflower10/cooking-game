@@ -780,6 +780,176 @@ body {
   .detail__card, .detail__tips { padding: 20px 18px 16px; }
 }
 
+/* ========== 做菜模式 ========== */
+.cooking { user-select: none; }
+.cooking.screen--active { display: flex; flex-direction: column; }
+
+.cooking__top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px 12px;
+}
+.cooking__exit {
+  flex: none;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cooking__exit:hover { color: var(--ink); border-color: var(--muted); }
+.cooking__name {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.cooking__count {
+  flex: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cooking__bar {
+  height: 6px;
+  margin: 0 24px;
+  background: var(--green-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.cooking__bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--green);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.cooking__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 26px;
+  padding: 16px 8vw 24px;
+  overflow-y: auto;
+}
+.cooking__num {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-btn);
+}
+.cooking__text {
+  max-width: 900px;
+  font-size: clamp(24px, 3.2vw, 40px);
+  font-weight: 700;
+  line-height: 1.85;
+  letter-spacing: 1px;
+}
+/* 步骤切换时的浮现动画 */
+.cooking__main.pop { animation: fadeUp 0.35s ease both; }
+
+.cook-timer { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.cook-timer__chip {
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: #fff;
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cook-timer__chip:hover { background: var(--green); color: #fff; }
+.cook-timer__big {
+  font-size: clamp(56px, 8vw, 88px);
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.cook-timer__big--done {
+  font-size: clamp(30px, 4vw, 46px);
+  color: var(--orange);
+  animation: pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.07); } }
+.cook-timer__row { display: flex; gap: 12px; }
+.cook-timer__btn {
+  padding: 10px 30px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: var(--bg-card);
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cook-timer__btn:hover { background: var(--green); color: #fff; }
+.cook-timer__btn--ghost { border-color: var(--line); color: var(--muted); }
+.cook-timer__btn--ghost:hover { background: transparent; color: var(--ink); border-color: var(--muted); }
+
+.cooking__nav {
+  display: flex;
+  gap: 16px;
+  padding: 16px 24px 36px;
+}
+.cooking__prev, .cooking__next {
+  padding: 16px 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cooking__prev {
+  flex: 1;
+  color: var(--green);
+  background: transparent;
+  border: 1.5px solid var(--green);
+}
+.cooking__prev:hover:not(:disabled) { background: var(--green-soft); }
+.cooking__prev:disabled { opacity: 0.35; cursor: default; }
+.cooking__next {
+  flex: 2;
+  color: #fff;
+  background: var(--green);
+  border: none;
+  box-shadow: var(--shadow-btn);
+}
+.cooking__next:hover { background: var(--green-dark); transform: translateY(-2px); }
+
+@media (max-width: 600px) {
+  .cooking__main { padding: 12px 7vw 18px; }
+  .cooking__prev, .cooking__next { font-size: 16px; letter-spacing: 2px; }
+}
+
 /* ========== Toast ========== */
 .toast {
   position: fixed;

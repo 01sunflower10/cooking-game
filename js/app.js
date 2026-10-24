@@ -234,9 +234,12 @@ $("#search-input").addEventListener("keydown", (e) => {
 });
 
 // ---------- 菜谱详情页 ----------
+let detailRecipe = null;
+
 function openDetail(id) {
   const r = RECIPES.find((x) => x.id === id);
   if (!r) return;
+  detailRecipe = r;
 
   $("#detail-body").innerHTML = `
     <div class="detail__hero">
@@ -292,11 +295,201 @@ $("#detail-body").addEventListener("click", (e) => {
     return;
   }
   if (e.target.closest("#btn-cook")) {
-    showToast("做菜模式马上上线，先照着步骤热热身 👨‍🍳");
+    openCooking(detailRecipe);
   }
 });
 
 $("#btn-detail-back").addEventListener("click", () => switchScreen(detailScreen, recipesScreen));
+
+// ---------- 做菜模式：步骤翻页 + 一键计时 + 响铃 + 屏幕常亮 ----------
+const cookingScreen = $("#screen-cooking");
+let cookRecipe = null;
+let stepIndex = 0;
+let timer = null;      // { interval, running, endAt, left }
+let audioCtx = null;
+let wakeLock = null;
+
+// 从步骤文字里识别时长（如 "炖 30 分钟"、"焖 3-4 分钟"、"半小时"）
+function findMinutes(text) {
+  const m = text.match(/(\d+)(?:\s*[-~]\s*\d+)?\s*分钟/);
+  if (m) return parseInt(m[1], 10);
+  if (/半[个]?小时/.test(text)) return 30;
+  return 0;
+}
+
+function openCooking(r) {
+  if (!r) return;
+  cookRecipe = r;
+  stepIndex = 0;
+  renderCookStep();
+  switchScreen(detailScreen, cookingScreen);
+  requestWakeLock();
+}
+
+function renderCookStep() {
+  const r = cookRecipe;
+  if (!r) return;
+  const s = r.steps[stepIndex];
+  $("#cook-dish").textContent = r.name;
+  $("#cook-step-now").textContent = stepIndex + 1;
+  $("#cook-step-total").textContent = r.steps.length;
+  $("#cook-num").textContent = stepIndex + 1;
+  $("#cook-text").textContent = s;
+  $("#cook-progress").style.width = ((stepIndex + 1) / r.steps.length) * 100 + "%";
+  $("#btn-prev").disabled = stepIndex === 0;
+  $("#btn-next").textContent = stepIndex === r.steps.length - 1 ? "完成做菜 🎉" : "下一步 →";
+  // 重放浮现动画
+  const main = $("#cook-main");
+  main.classList.remove("pop");
+  void main.offsetWidth;
+  main.classList.add("pop");
+  renderTimerChip(findMinutes(s));
+}
+
+function fmt(sec) {
+  const m = String(Math.floor(sec / 60)).padStart(2, "0");
+  const s = String(sec % 60).padStart(2, "0");
+  return m + ":" + s;
+}
+
+function clearTimer() {
+  if (timer && timer.interval) clearInterval(timer.interval);
+  timer = null;
+}
+
+// 步骤含时长时显示计时入口
+function renderTimerChip(mins) {
+  clearTimer();
+  const box = $("#cook-timer");
+  if (!mins) { box.hidden = true; box.innerHTML = ""; return; }
+  box.hidden = false;
+  box.innerHTML = `<button class="cook-timer__chip" id="timer-start" type="button">⏱ 这一步约 ${mins} 分钟 · 点击开始计时</button>`;
+  $("#timer-start").addEventListener("click", () => startTimer(mins * 60));
+}
+
+function startTimer(total) {
+  clearTimer(); // 启动新计向前，确保旧计时已停止
+  ensureCtx();
+  const box = $("#cook-timer");
+  box.innerHTML = `
+    <div class="cook-timer__big" id="timer-display">${fmt(total)}</div>
+    <div class="cook-timer__row">
+      <button class="cook-timer__btn" id="timer-pause" type="button">暂停</button>
+      <button class="cook-timer__btn cook-timer__btn--ghost" id="timer-reset" type="button">跳过</button>
+    </div>`;
+  let left = total;
+  let running = true;
+  let endAt = Date.now() + total * 1000;
+
+  const tick = () => {
+    if (!running) return;
+    left = Math.max(0, Math.round((endAt - Date.now()) / 1000));
+    const disp = $("#timer-display");
+    if (disp) disp.textContent = fmt(left);
+    if (left <= 0) timerDone(total);
+  };
+
+  timer = { interval: setInterval(tick, 250) };
+  $("#timer-pause").addEventListener("click", () => {
+    const btn = $("#timer-pause");
+    if (!btn) return;
+    if (running) {
+      running = false;
+      clearInterval(timer.interval);
+      timer.interval = null;
+      btn.textContent = "继续";
+    } else {
+      running = true;
+      endAt = Date.now() + left * 1000;
+      timer.interval = setInterval(tick, 250);
+      btn.textContent = "暂停";
+    }
+  });
+  $("#timer-reset").addEventListener("click", () => renderTimerChip(Math.round(total / 60)));
+}
+
+function timerDone(total) {
+  if (timer) { clearInterval(timer.interval); timer.interval = null; }
+  beep();
+  const disp = $("#timer-display");
+  if (disp) {
+    disp.textContent = "⏰ 时间到！";
+    disp.classList.add("cook-timer__big--done");
+  }
+  const row = document.querySelector(".cook-timer__row");
+  if (row) row.innerHTML = `<button class="cook-timer__btn" id="timer-done-ok" type="button">收到，继续 👌</button>`;
+  const ok = $("#timer-done-ok");
+  if (ok) ok.addEventListener("click", () => renderTimerChip(Math.round(total / 60)));
+  showToast("时间到了，回到灶台看看吧 🔥");
+}
+
+// WebAudio 三声蜂鸣
+function ensureCtx() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) {}
+}
+function beep() {
+  if (!audioCtx) return;
+  try {
+    for (let i = 0; i < 3; i++) {
+      const t0 = audioCtx.currentTime + i * 0.55;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = "sine";
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.4, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
+      o.connect(g).connect(audioCtx.destination);
+      o.start(t0);
+      o.stop(t0 + 0.45);
+    }
+  } catch (e) {}
+}
+
+// 屏幕常亮（支持时申请，失败静默降级）
+async function requestWakeLock() {
+  try {
+    if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen");
+  } catch (e) {}
+}
+function releaseWakeLock() {
+  try { if (wakeLock) wakeLock.release(); } catch (e) {}
+  wakeLock = null;
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && cookingScreen.classList.contains("screen--active")) {
+    requestWakeLock();
+  }
+});
+
+function closeCooking() {
+  clearTimer();
+  releaseWakeLock();
+  cookRecipe = null;
+  switchScreen(cookingScreen, detailScreen);
+}
+
+$("#btn-prev").addEventListener("click", () => {
+  if (!cookRecipe || stepIndex === 0) return;
+  clearTimer();
+  stepIndex--;
+  renderCookStep();
+});
+$("#btn-next").addEventListener("click", () => {
+  if (!cookRecipe) return;
+  clearTimer();
+  if (stepIndex < cookRecipe.steps.length - 1) {
+    stepIndex++;
+    renderCookStep();
+  } else {
+    showToast(`「${cookRecipe.name}」出锅啦，祝你好胃口 🎉`);
+    closeCooking();
+  }
+});
+$("#btn-cook-exit").addEventListener("click", closeCooking);
 
 // ---------- Toast ----------
 let toastTimer;

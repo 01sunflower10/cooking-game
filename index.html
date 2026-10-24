@@ -110,7 +110,7 @@
       <!-- 卡片由 js/app.js 渲染 -->
     </main>
 
-    <footer class="recipes__footer">食光机 · 框架版本 v0.1 · 做菜模式即将上线</footer>
+    <footer class="recipes__footer">食光机 · v0.2 · 选菜 → 详情 → 跟着做菜，全流程跑通</footer>
   </section>
 
   <!-- ========== 第三屏：菜谱详情 ========== -->
@@ -121,6 +121,25 @@
     <div class="detail__body" id="detail-body">
       <!-- 详情内容由 js/app.js 渲染 -->
     </div>
+  </section>
+
+  <!-- ========== 第四屏：做菜模式 ========== -->
+  <section id="screen-cooking" class="screen cooking">
+    <header class="cooking__top">
+      <button id="btn-cook-exit" class="cooking__exit" type="button">✕ 退出</button>
+      <div class="cooking__name" id="cook-dish">菜名</div>
+      <div class="cooking__count"><span id="cook-step-now">1</span> / <span id="cook-step-total">-</span></div>
+    </header>
+    <div class="cooking__bar"><i id="cook-progress"></i></div>
+    <main class="cooking__main" id="cook-main">
+      <div class="cooking__num" id="cook-num">1</div>
+      <p class="cooking__text" id="cook-text"></p>
+      <div class="cook-timer" id="cook-timer" hidden></div>
+    </main>
+    <footer class="cooking__nav">
+      <button id="btn-prev" class="cooking__prev" type="button">← 上一步</button>
+      <button id="btn-next" class="cooking__next" type="button">下一步 →</button>
+    </footer>
   </section>
 
   <!-- 全局提示 -->
