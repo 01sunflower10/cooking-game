@@ -230,12 +230,60 @@ RECIPES.forEach((r) => {
   r.keys = keys;
 });
 
+// ---------- 本地数据（收藏/采购计划/做饭时光轴，存于浏览器 localStorage） ----------
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+const favs = store.get("sgj_favs", []);        // 收藏的菜谱 id
+const plans = store.get("sgj_plans", []);      // 采购计划中的菜谱 id
+let timeline = store.get("sgj_timeline", []);  // 做饭记录 [{id, date, rating, note}]
+let planChecked = store.get("sgj_plan_checked", {}); // 采购清单勾选状态 {id:[食材下标]}
+
+const saveFavs = () => store.set("sgj_favs", favs);
+const savePlans = () => store.set("sgj_plans", plans);
+const saveTimeline = () => store.set("sgj_timeline", timeline);
+const savePlanChecked = () => store.set("sgj_plan_checked", planChecked);
+
+const isFav = (id) => favs.includes(id);
+function toggleFav(id) {
+  const i = favs.indexOf(id);
+  i >= 0 ? favs.splice(i, 1) : favs.push(id);
+  saveFavs();
+  return i < 0;
+}
+function togglePlan(id) {
+  const i = plans.indexOf(id);
+  i >= 0 ? plans.splice(i, 1) : plans.push(id);
+  savePlans();
+  return i < 0;
+}
+function fmtDate(d) {
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+// 连续做饭天数（今天或昨天起算）
+function cookStreak() {
+  const days = [...new Set(timeline.map((t) => t.date))];
+  if (!days.length) return 0;
+  let cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+  if (!days.includes(fmtDate(cursor))) cursor = new Date(cursor.getTime() - 86400000);
+  let n = 0;
+  while (days.includes(fmtDate(cursor))) {
+    n++;
+    cursor = new Date(cursor.getTime() - 86400000);
+  }
+  return n;
+}
+
 const $ = (sel) => document.querySelector(sel);
 
 // ---------- 屏幕切换 ----------
 const welcomeScreen = $("#screen-welcome");
 const recipesScreen = $("#screen-recipes");
 const detailScreen = $("#screen-detail");
+let lastListScreen = null; // 打开详情前所在的列表屏（选菜谱/我的食光）
 
 function switchScreen(from, to) {
   from.classList.remove("screen--active");
@@ -289,6 +337,7 @@ function renderRecipes() {
             ? `<img src="${r.img}" alt="${r.name}" loading="lazy" />`
             : `<div class="img-placeholder"><span class="img-placeholder__emoji">${r.emoji || "🍽"}</span><span class="img-placeholder__text">图片待补</span></div>`}
           <span class="recipe-card__badge">${r.cat}</span>
+          <button class="fav-btn${isFav(r.id) ? " on" : ""}" data-fav="${r.id}" type="button" title="收藏">${isFav(r.id) ? "❤️" : "🤍"}</button>
         </div>
         <div class="recipe-card__body">
           <h3 class="recipe-card__name">${r.name}</h3>
@@ -320,6 +369,15 @@ bindFilterGroup("#levels");
 
 // ---------- 框架占位交互 ----------
 $("#recipe-grid").addEventListener("click", (e) => {
+  const favBtn = e.target.closest(".fav-btn");
+  if (favBtn) {
+    const id = Number(favBtn.dataset.fav);
+    const on = toggleFav(id);
+    favBtn.classList.toggle("on", on);
+    favBtn.textContent = on ? "❤️" : "🤍";
+    showToast(on ? "已加入收藏 ❤️ 想吃的都记着" : "已取消收藏");
+    return; // 不触发进详情
+  }
   const card = e.target.closest(".recipe-card");
   if (!card) return;
   openDetail(Number(card.dataset.id));
@@ -359,6 +417,15 @@ function renderIngredientList(r, scale) {
   </ul>`;
 }
 
+// 上次做饭笔记条（做菜笔记的核心：下次做给自己看）
+function renderLastNote(r) {
+  const last = timeline.filter((t) => t.id === r.id).sort((a, b) => (a.date < b.date ? 1 : -1))[0];
+  if (!last) return "";
+  const stars = last.rating ? "⭐".repeat(last.rating) : "";
+  const note = last.note ? `「${last.note}」` : "";
+  return `<div class="last-note">📅 上次做 ${last.date} ${stars} ${note}</div>`;
+}
+
 function renderServingButtons(r) {
   const base = baseServings(r.servings);
   const opts = [
@@ -373,7 +440,7 @@ function renderServingButtons(r) {
   </div>`;
 }
 
-function openDetail(id) {
+function openDetail(id, from) {
   const r = RECIPES.find((x) => x.id === id);
   if (!r) return;
   detailRecipe = r;
@@ -388,7 +455,10 @@ function openDetail(id) {
       </div>
     </div>
     <div class="detail__info">
-      <h2 class="detail__title">${r.name}</h2>
+      <div class="detail__title-row">
+        <h2 class="detail__title">${r.name}</h2>
+        <button class="fav-btn fav-btn--detail${isFav(r.id) ? " on" : ""}" id="detail-fav" type="button" title="收藏">${isFav(r.id) ? "❤️" : "🤍"}</button>
+      </div>
       <div class="detail__badges">
         <span class="badge badge--cat">${r.cat}</span>
         <span class="badge">${r.cuisine}</span>
@@ -399,6 +469,7 @@ function openDetail(id) {
         <span class="meta-chip">🍽 ${r.servings}</span>
       </div>
 
+      ${renderLastNote(r)}
       ${renderServingButtons(r)}
 
       <div class="detail__card">
@@ -418,15 +489,35 @@ function openDetail(id) {
         <ul class="tips-list">${r.tips.map((t) => `<li>${t}</li>`).join("")}</ul>
       </div>
 
-      <button class="btn-start btn-start--detail" id="btn-cook" type="button">开始做菜 🔥</button>
+      <div class="detail__actions">
+        <button class="btn-start btn-start--detail" id="btn-cook" type="button">开始做菜 🔥</button>
+        <button class="btn-plan${plans.includes(r.id) ? " on" : ""}" id="btn-plan" type="button">${plans.includes(r.id) ? "✓ 已在采购计划" : "🛒 加入采购计划"}</button>
+      </div>
     </div>`;
 
-  switchScreen(recipesScreen, detailScreen);
+  lastListScreen = from || recipesScreen;
+  switchScreen(lastListScreen, detailScreen);
   detailScreen.scrollTop = 0;
 }
 
-// 详情页交互：份量换算 + 食材勾选 + 做菜按钮
+// 详情页交互：份量换算 + 收藏 + 采购计划 + 食材勾选 + 做菜按钮
 $("#detail-body").addEventListener("click", (e) => {
+  const favBtn = e.target.closest("#detail-fav");
+  if (favBtn) {
+    const on = toggleFav(detailRecipe.id);
+    favBtn.classList.toggle("on", on);
+    favBtn.textContent = on ? "❤️" : "🤍";
+    showToast(on ? "已加入收藏 ❤️" : "已取消收藏");
+    return;
+  }
+  const planBtn = e.target.closest("#btn-plan");
+  if (planBtn) {
+    const on = togglePlan(detailRecipe.id);
+    planBtn.classList.toggle("on", on);
+    planBtn.textContent = on ? "✓ 已在采购计划" : "🛒 加入采购计划";
+    showToast(on ? "已加入采购计划 🛒 去超市前记得打开采购清单" : "已移出采购计划");
+    return;
+  }
   const sBtn = e.target.closest(".serving-btn");
   if (sBtn) {
     detailScale = parseFloat(sBtn.dataset.scale);
@@ -445,7 +536,11 @@ $("#detail-body").addEventListener("click", (e) => {
   }
 });
 
-$("#btn-detail-back").addEventListener("click", () => switchScreen(detailScreen, recipesScreen));
+$("#btn-detail-back").addEventListener("click", () => {
+  const back = lastListScreen || recipesScreen;
+  if (back === mineScreen) renderMine(); // 返回我的食光前刷新收藏/计划状态
+  switchScreen(detailScreen, back);
+});
 
 // ---------- 做菜模式：步骤翻页 + 一键计时 + 响铃 + 屏幕常亮 ----------
 const cookingScreen = $("#screen-cooking");
@@ -631,11 +726,156 @@ $("#btn-next").addEventListener("click", () => {
     stepIndex++;
     renderCookStep();
   } else {
-    showToast(`「${cookRecipe.name}」出锅啦，祝你好胃口 🎉`);
-    closeCooking();
+    // 完成做菜 → 弹出记录（打分+心得写入时光轴）
+    showRecordModal();
   }
 });
 $("#btn-cook-exit").addEventListener("click", closeCooking);
+
+// ---------- 做饭记录弹窗 ----------
+let recordRating = 0;
+
+function showRecordModal() {
+  recordRating = 0;
+  $("#record-dish").textContent = `「${cookRecipe.name}」出锅！`;
+  $("#record-note").value = "";
+  renderStars();
+  showModal("record-modal");
+}
+
+function renderStars() {
+  $("#record-star-row").innerHTML = [1, 2, 3, 4, 5]
+    .map((n) => `<button class="record__star${n <= recordRating ? " lit" : ""}" data-n="${n}" type="button">${n <= recordRating ? "★" : "☆"}</button>`)
+    .join("");
+}
+
+$("#record-star-row").addEventListener("click", (e) => {
+  const star = e.target.closest(".record__star");
+  if (!star) return;
+  recordRating = Number(star.dataset.n);
+  renderStars();
+});
+
+$("#btn-record-save").addEventListener("click", () => {
+  timeline.push({
+    id: cookRecipe.id,
+    date: fmtDate(new Date()),
+    rating: recordRating,
+    note: $("#record-note").value.trim(),
+  });
+  saveTimeline();
+  closeModal();
+  closeCooking();
+  const streak = cookStreak();
+  showToast(streak >= 3 ? `记录成功！🔥 已连续做饭 ${streak} 天` : "已记入时光轴 📖 今天也是好好吃饭的一天");
+});
+
+$("#btn-record-skip").addEventListener("click", () => {
+  timeline.push({ id: cookRecipe.id, date: fmtDate(new Date()), rating: 0, note: "" });
+  saveTimeline();
+  closeModal();
+  closeCooking();
+  showToast("已记入时光轴 📖");
+});
+
+// ---------- 我的食光（收藏夹 / 采购清单 / 做饭时光轴） ----------
+const mineScreen = $("#screen-mine");
+
+$("#btn-mine").addEventListener("click", () => {
+  renderMine();
+  switchScreen(recipesScreen, mineScreen);
+});
+$("#btn-mine-back").addEventListener("click", () => {
+  renderRecipes();
+  switchScreen(mineScreen, recipesScreen);
+});
+
+function renderMine() {
+  const streak = cookStreak();
+  const streakHtml = streak >= 2
+    ? `<div class="streak">${streak >= 7 ? "🏅" : "🔥"} 已连续做饭 ${streak} 天${streak >= 7 ? " · 一周不断火！" : "，继续保持"}</div>`
+    : "";
+
+  const favCards = favs
+    .map((id) => RECIPES.find((r) => r.id === id))
+    .filter(Boolean)
+    .map((r) => `
+      <div class="mine__fav-card" data-open="${r.id}">
+        <span class="mine__fav-thumb">${r.img ? `<img src="${r.img}" alt="${r.name}" />` : (r.emoji || "🍽️")}</span>
+        <span class="mine__fav-name">${r.name}<br/><small style="color:var(--muted);font-weight:500">${r.cuisine} · ${r.time}</small></span>
+      </div>`)
+    .join("");
+
+  const planCards = plans
+    .map((id) => RECIPES.find((r) => r.id === id))
+    .filter(Boolean)
+    .map((r) => {
+      const checked = planChecked[r.id] || [];
+      return `<div class="plan-card">
+        <div class="plan-card__head">
+          <span class="plan-card__name">${r.name}</span>
+          <button class="plan-card__remove" data-remove="${r.id}" type="button">移出计划 ✕</button>
+        </div>
+        <ul class="ing-list">
+          ${r.ingredients.map((ing, i) => `<li class="ing${checked.includes(i) ? " checked" : ""}" data-plan="${r.id}" data-i="${i}"><span class="ing__box"></span><span class="ing__name">${ing}</span></li>`).join("")}
+        </ul>
+      </div>`;
+    })
+    .join("");
+
+  const tlItems = [...timeline]
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .map((t) => {
+      const r = RECIPES.find((x) => x.id === t.id);
+      return `<div class="tl-item">
+        <div class="tl-item__date">${t.date}</div>
+        <div class="tl-item__name">${r ? r.name : "已下架的菜谱"}${t.rating ? ` <span class="tl-item__stars">${"⭐".repeat(t.rating)}</span>` : ""}</div>
+        ${t.note ? `<div class="tl-item__note">「${t.note}」</div>` : ""}
+      </div>`;
+    })
+    .join("");
+
+  $("#mine-body").innerHTML = `
+    <div class="mine__section">
+      <h3 class="mine__section-title">❤️ 收藏夹 <small>想吃的都在这</small></h3>
+      ${favs.length ? `<div class="mine__fav-grid">${favCards}</div>` : `<div class="mine__empty">还没有收藏～<br/>点菜谱卡片右上角的 🤍 收起来</div>`}
+    </div>
+    <div class="mine__section">
+      <h3 class="mine__section-title">🛒 采购清单 <small>去超市前打开，逐项勾掉</small></h3>
+      ${plans.length ? planCards : `<div class="mine__empty">采购计划是空的～<br/>在菜谱详情页点「🛒 加入采购计划」</div>`}
+    </div>
+    <div class="mine__section">
+      <h3 class="mine__section-title">📖 做饭时光轴 <small>记录每一顿亲手做的饭</small></h3>
+      ${streakHtml}
+      ${timeline.length ? `<div class="tl">${tlItems}</div>` : `<div class="mine__empty">还没下过厨～<br/>做完一道菜会自动记到这里</div>`}
+    </div>`;
+}
+
+$("#mine-body").addEventListener("click", (e) => {
+  const removeBtn = e.target.closest("[data-remove]");
+  if (removeBtn) {
+    togglePlan(Number(removeBtn.dataset.remove));
+    renderMine();
+    showToast("已移出采购计划");
+    return;
+  }
+  const ing = e.target.closest(".ing[data-plan]");
+  if (ing) {
+    const pid = ing.dataset.plan;
+    const idx = Number(ing.dataset.i);
+    const arr = planChecked[pid] || [];
+    const pos = arr.indexOf(idx);
+    pos >= 0 ? arr.splice(pos, 1) : arr.push(idx);
+    planChecked[pid] = arr;
+    savePlanChecked();
+    ing.classList.toggle("checked");
+    return;
+  }
+  const card = e.target.closest("[data-open]");
+  if (card) {
+    openDetail(Number(card.dataset.open), mineScreen);
+  }
+});
 
 // ---------- Toast ----------
 let toastTimer;

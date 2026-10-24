@@ -1113,6 +1113,238 @@ body {
 }
 .fridge__row__note--ok { color: var(--green); font-weight: 700; }
 
+/* ========== 我的食光（收藏/采购/时光轴） ========== */
+.mine { overflow-y: auto; padding: 0 6vw 60px; }
+.mine__header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0 16px;
+  background: linear-gradient(var(--bg) 78%, rgba(251, 244, 232, 0));
+}
+.mine__title { font-size: 22px; font-weight: 800; letter-spacing: 3px; }
+.mine__body { padding-top: 8px; }
+
+.mine__section { margin-bottom: 38px; }
+.mine__section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+.mine__section-title small { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 1px; }
+.mine__empty {
+  padding: 26px 20px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: 1px;
+  color: var(--muted);
+  background: var(--bg-card);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+}
+
+/* 收藏夹 */
+.mine__fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px;
+}
+.mine__fav-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.mine__fav-card:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(63, 90, 56, 0.14); }
+.mine__fav-thumb {
+  flex: none;
+  width: 58px;
+  height: 46px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f6ecd9, #efe0c4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.mine__fav-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.mine__fav-name { font-size: 14.5px; font-weight: 700; line-height: 1.4; }
+
+/* 采购清单 */
+.plan-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.plan-card__head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.plan-card__name { font-size: 16px; font-weight: 800; letter-spacing: 1px; }
+.plan-card__remove {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.plan-card__remove:hover { color: #c0392b; background: rgba(192, 57, 43, 0.08); }
+.plan-card .ing { padding: 7px 2px; }
+
+/* 时光轴 */
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--orange);
+  background: rgba(242, 107, 58, 0.1);
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+.tl { position: relative; padding-left: 26px; }
+.tl::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--line);
+}
+.tl-item { position: relative; padding-bottom: 22px; }
+.tl-item::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: 2.5px solid var(--bg);
+  box-shadow: 0 0 0 1.5px var(--orange);
+}
+.tl-item__date { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--muted); }
+.tl-item__name { font-size: 16px; font-weight: 800; margin: 4px 0; }
+.tl-item__note {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #6b6247;
+  background: #fdf8e3;
+  border: 1px solid #efe3b0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 6px;
+  transform: rotate(-0.3deg);
+}
+.tl-item__stars { color: var(--orange); font-size: 14px; letter-spacing: 2px; }
+
+/* 做饭记录弹窗 */
+.record__dish { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+.record__stars { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.record__star-row { display: flex; gap: 4px; font-size: 30px; line-height: 1; }
+.record__star {
+  cursor: pointer;
+  color: #ddd2b8;
+  transition: transform 0.15s ease, color 0.15s ease;
+  background: none;
+  border: none;
+  padding: 2px;
+}
+.record__star:hover { transform: scale(1.15); }
+.record__star.lit { color: var(--orange); }
+.record__note {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 14.5px;
+  font-family: inherit;
+  color: var(--ink);
+  resize: vertical;
+  margin-bottom: 18px;
+}
+.record__note:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 4px var(--green-soft); }
+
+/* 收藏爱心（卡片与详情页） */
+.fav-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 253, 248, 0.92);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(47, 58, 43, 0.18);
+  transition: transform 0.15s ease;
+}
+.fav-btn:hover { transform: scale(1.12); }
+.fav-btn.on { background: rgba(242, 107, 58, 0.92); }
+.fav-btn--detail {
+  position: static;
+  width: 46px;
+  height: 46px;
+  font-size: 22px;
+  flex: none;
+}
+
+/* 详情页：上次做饭 + 按钮行 */
+.last-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  margin-bottom: 26px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: #6b6247;
+  background: #fdf8e3;
+  border: 1px solid #efe3b0;
+  border-radius: 12px;
+}
+.detail__actions { display: flex; gap: 12px; }
+.detail__actions .btn-start { flex: 2; }
+.btn-plan {
+  flex: 1;
+  padding: 18px 10px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: var(--bg-card);
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-plan:hover { background: var(--green-soft); }
+.btn-plan.on { background: var(--green); color: #fff; }
+
 /* ========== Toast ========== */
 .toast {
   position: fixed;
