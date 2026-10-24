@@ -428,11 +428,39 @@ body {
 
 /* 筛选器（分类 + 菜系，均可选） */
 .recipes__filters {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 14px 28px;
   padding: 6px 0 26px;
 }
+
+/* 快捷工具行 */
+.quick-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 2px 0 20px;
+}
+.tool-btn {
+  padding: 13px 26px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: var(--bg-card);
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tool-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(79, 111, 70, 0.25); }
+.tool-btn--primary {
+  color: #fff;
+  background: var(--orange);
+  border-color: var(--orange);
+  box-shadow: 0 8px 18px rgba(242, 107, 58, 0.3);
+}
+.tool-btn--primary:hover { box-shadow: 0 10px 22px rgba(242, 107, 58, 0.4); }
 .filter-group {
   display: flex;
   align-items: center;
@@ -976,6 +1004,112 @@ body {
   .cooking__main { padding: 12px 7vw 18px; }
   .cooking__prev, .cooking__next { font-size: 16px; letter-spacing: 2px; }
 }
+
+/* ========== 弹窗（今日灵感 / 冰箱找菜） ========== */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(47, 58, 43, 0.45);
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.25s ease;
+}
+.modal-mask[hidden] { display: none; }
+
+.modal {
+  width: min(440px, 92vw);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 26px 28px 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  animation: fadeUp 0.3s ease;
+}
+.modal--wide { width: min(560px, 94vw); max-height: 84vh; overflow-y: auto; }
+.modal__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal__title { font-size: 19px; font-weight: 800; letter-spacing: 2px; }
+.modal__close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.modal__close:hover { color: var(--ink); background: var(--green-soft); }
+
+/* 老虎机 */
+.slot__stage { text-align: center; padding: 22px 0 30px; }
+.slot__emoji { font-size: 62px; line-height: 1.2; }
+.slot__name {
+  min-height: 38px;
+  margin-top: 10px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.slot__meta { min-height: 22px; margin-top: 8px; font-size: 14px; letter-spacing: 1px; color: var(--muted); }
+.slot__stage.done .slot__emoji { animation: bounce 0.6s ease; }
+.slot__stage.done .slot__name { color: var(--green); }
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+}
+
+.modal__actions { display: flex; gap: 12px; }
+.modal__actions .btn-back { flex: 1; margin: 0; animation: none; }
+.modal__actions .btn-start { flex: 1.4; margin: 0; padding: 14px 0; font-size: 17px; animation: none; }
+
+/* 冰箱找菜 */
+.fridge__hint { font-size: 14px; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; }
+.fridge__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed var(--line);
+}
+.fchip {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.fchip:hover { border-color: var(--green); }
+.fchip.on { background: var(--green); border-color: var(--green); color: #fff; }
+
+.fridge__results { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; }
+.fridge__empty { padding: 26px 0; text-align: center; font-size: 14px; letter-spacing: 1px; color: var(--muted); }
+.fridge__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.fridge__row:hover { background: var(--green-soft); }
+.fridge__row__emoji { flex: none; font-size: 26px; }
+.fridge__row__name { font-size: 15px; font-weight: 700; }
+.fridge__row__note {
+  margin-left: auto;
+  max-width: 60%;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: right;
+}
+.fridge__row__note--ok { color: var(--green); font-weight: 700; }
 
 /* ========== Toast ========== */
 .toast {

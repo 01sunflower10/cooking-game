@@ -207,6 +207,29 @@ const RECIPES = [
   },
 ];
 
+// 口味与主料映射（flavor=口味标签, keys=冰箱找菜主料）
+const FLAVOR_KEYS = {
+  1:  ["咸鲜", ["牛腩", "番茄", "土豆"]],
+  2:  ["清淡", ["鸡蛋", "西兰花", "圣女果", "玉米粒"]],
+  3:  ["咸鲜", ["面条", "小葱"]],
+  4:  ["酸甜", ["意面", "番茄", "淡奶油"]],
+  5:  ["咸鲜", ["大米", "腊肠", "腊肉", "青菜", "鸡蛋"]],
+  6:  ["咸鲜", ["拉面", "叉烧", "高汤"]],
+  7:  ["清淡", ["三文鱼", "米饭", "牛油果"]],
+  8:  ["辣",   ["羊肉", "洋葱"]],
+  9:  ["辣",   ["五花肉", "青椒"]],
+  10: ["辣",   ["米饭", "鸡蛋", "菠菜", "豆芽", "牛肉末"]],
+  11: ["酸甜", ["里脊", "鸡蛋", "番茄酱"]],
+  12: ["酸甜", ["草鱼"]],
+  13: ["酸甜", ["里脊", "马蹄"]],
+  14: ["咸鲜", ["鳜鱼", "五花肉", "冬笋"]],
+};
+RECIPES.forEach((r) => {
+  const [flavor, keys] = FLAVOR_KEYS[r.id];
+  r.flavor = flavor;
+  r.keys = keys;
+});
+
 const $ = (sel) => document.querySelector(sel);
 
 // ---------- 屏幕切换 ----------
@@ -226,20 +249,34 @@ function switchScreen(from, to) {
 $("#btn-start").addEventListener("click", () => switchScreen(welcomeScreen, recipesScreen));
 $("#btn-back").addEventListener("click", () => switchScreen(recipesScreen, welcomeScreen));
 
-// ---------- 菜谱卡片渲染（分类 + 菜系 双筛选，均可选） ----------
-const currentCat = () => $("#cats .cat--active").dataset.cat;
-const currentCuisine = () => $("#cuisines .cat--active").dataset.cuisine;
-
+// ---------- 菜谱卡片渲染（分类/菜系/耗时/口味/难度 五维筛选，均可选） ----------
 function renderRecipes() {
   const grid = $("#recipe-grid");
-  const cat = currentCat();
-  const cuisine = currentCuisine();
+  const cat = $("#cats .cat--active").dataset.cat;
+  const cuisine = $("#cuisines .cat--active").dataset.cuisine;
+  const time = $("#times .cat--active").dataset.time;
+  const flavor = $("#flavors .cat--active").dataset.flavor;
+  const level = $("#levels .cat--active").dataset.level;
+
+  const minutes = (r) => parseInt(r.time, 10);
+  const timeOk = (r) =>
+    time === "all" ||
+    (time === "20" && minutes(r) <= 20) ||
+    (time === "40" && minutes(r) > 20 && minutes(r) <= 40) ||
+    (time === "41" && minutes(r) > 40);
+  const flavorOk = (r) => flavor === "不限" || (flavor === "辣" ? /辣/.test(r.flavor) : r.flavor === flavor);
+
   const list = RECIPES.filter(
-    (r) => (cat === "全部" || r.cat === cat) && (cuisine === "不限" || r.cuisine === cuisine)
+    (r) =>
+      (cat === "全部" || r.cat === cat) &&
+      (cuisine === "不限" || r.cuisine === cuisine) &&
+      timeOk(r) &&
+      flavorOk(r) &&
+      (level === "不限" || r.level === level)
   );
 
   if (!list.length) {
-    grid.innerHTML = `<div class="empty-state">这个组合下暂时没有菜谱 🥲<br/>换个分类或菜系试试吧</div>`;
+    grid.innerHTML = `<div class="empty-state">这个组合下暂时没有菜谱 🥲<br/>换个筛选条件试试吧</div>`;
     return;
   }
 
@@ -277,6 +314,9 @@ function bindFilterGroup(groupId) {
 }
 bindFilterGroup("#cats");
 bindFilterGroup("#cuisines");
+bindFilterGroup("#times");
+bindFilterGroup("#flavors");
+bindFilterGroup("#levels");
 
 // ---------- 框架占位交互 ----------
 $("#recipe-grid").addEventListener("click", (e) => {
@@ -630,6 +670,142 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     }
   })();
 }
+
+// ---------- 弹窗通用 ----------
+const modalMask = $("#modal-mask");
+function showModal(id) {
+  modalMask.hidden = false;
+  document.querySelectorAll(".modal").forEach((m) => (m.hidden = true));
+  $("#" + id).hidden = false;
+}
+function closeModal() {
+  modalMask.hidden = true;
+  stopSlot();
+}
+modalMask.addEventListener("click", (e) => {
+  if (e.target === modalMask || e.target.closest("[data-close]")) closeModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !modalMask.hidden) closeModal();
+});
+
+// ---------- 今日灵感老虎机 ----------
+let slotTimer = null;
+let slotPick = null;
+
+function stopSlot() {
+  if (slotTimer) clearTimeout(slotTimer);
+  slotTimer = null;
+}
+
+function openSlot() {
+  showModal("slot-modal");
+  runSlot();
+}
+
+function runSlot() {
+  stopSlot();
+  const stage = $("#slot-stage");
+  stage.classList.remove("done");
+  let delay = 60;
+
+  const tick = () => {
+    slotPick = RECIPES[Math.floor(Math.random() * RECIPES.length)];
+    $("#slot-emoji").textContent = slotPick.emoji || "🍽️";
+    $("#slot-name").textContent = slotPick.name;
+    $("#slot-meta").textContent = `${slotPick.cuisine} · ${slotPick.time} · ${slotPick.level}`;
+  };
+  tick();
+
+  // 间隔逐步拉长，像老虎机减速停下
+  const schedule = () => {
+    slotTimer = setTimeout(() => {
+      delay = Math.min(delay * 1.35, 430);
+      tick();
+      if (delay < 430) {
+        schedule();
+      } else {
+        stage.classList.add("done");
+        $("#slot-meta").textContent = `就决定是你了！${slotPick.cuisine} · ${slotPick.time} · ${slotPick.level}`;
+      }
+    }, delay);
+  };
+  schedule();
+}
+
+$("#btn-slot").addEventListener("click", openSlot);
+$("#btn-slot-again").addEventListener("click", runSlot);
+$("#btn-slot-go").addEventListener("click", () => {
+  if (!slotPick) return;
+  closeModal();
+  openDetail(slotPick.id);
+});
+
+// ---------- 冰箱找菜 ----------
+let fridgeSel = new Set();
+
+function openFridge() {
+  showModal("fridge-modal");
+  renderFridgeChips();
+  renderFridgeResults();
+}
+
+function renderFridgeChips() {
+  const pool = [];
+  RECIPES.forEach((r) => r.keys.forEach((k) => { if (!pool.includes(k)) pool.push(k); }));
+  $("#fridge-chips").innerHTML = pool
+    .map((k) => `<button class="fchip${fridgeSel.has(k) ? " on" : ""}" data-k="${k}" type="button">${fridgeSel.has(k) ? "✓ " : ""}${k}</button>`)
+    .join("");
+}
+
+function renderFridgeResults() {
+  const box = $("#fridge-results");
+  if (!fridgeSel.size) {
+    box.innerHTML = `<div class="fridge__empty">先勾选几个食材吧，马上告诉你能做什么 🥕</div>`;
+    return;
+  }
+  const scored = RECIPES.map((r) => ({
+    r,
+    have: r.keys.filter((k) => fridgeSel.has(k)),
+    miss: r.keys.filter((k) => !fridgeSel.has(k)),
+  }))
+    .filter((x) => x.have.length > 0)
+    .sort((a, b) => b.have.length - a.have.length);
+
+  if (!scored.length) {
+    box.innerHTML = `<div class="fridge__empty">这些食材暂时配不上菜谱，再添几样试试 🤔</div>`;
+    return;
+  }
+  box.innerHTML = scored
+    .map(({ r, have, miss }) => {
+      const ok = miss.length === 0;
+      const note = ok
+        ? "✅ 马上就能做"
+        : `还差 ${miss.length} 样：${miss.join("、")}`;
+      return `<div class="fridge__row" data-id="${r.id}">
+        <span class="fridge__row__emoji">${r.emoji || "🍽️"}</span>
+        <span class="fridge__row__name">${r.name}</span>
+        <span class="fridge__row__note${ok ? " fridge__row__note--ok" : ""}">${note}</span>
+      </div>`;
+    })
+    .join("");
+}
+
+$("#btn-fridge").addEventListener("click", openFridge);
+$("#fridge-chips").addEventListener("click", (e) => {
+  const chip = e.target.closest(".fchip");
+  if (!chip) return;
+  const k = chip.dataset.k;
+  fridgeSel.has(k) ? fridgeSel.delete(k) : fridgeSel.add(k);
+  renderFridgeChips();
+  renderFridgeResults();
+});
+$("#fridge-results").addEventListener("click", (e) => {
+  const row = e.target.closest(".fridge__row");
+  if (!row) return;
+  closeModal();
+  openDetail(Number(row.dataset.id));
+});
 
 // ---------- 初始化 ----------
 renderRecipes();

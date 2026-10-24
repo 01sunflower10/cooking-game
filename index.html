@@ -78,6 +78,11 @@
       <button id="btn-back" class="btn-back" type="button" title="返回首页">返回首页</button>
     </header>
 
+    <div class="quick-tools">
+      <button id="btn-slot" class="tool-btn tool-btn--primary" type="button">🎲 今日灵感 · 抽一道</button>
+      <button id="btn-fridge" class="tool-btn" type="button">🧊 冰箱找菜 · 有啥做啥</button>
+    </div>
+
     <div class="recipes__filters">
       <div class="filter-group">
         <span class="filter-label">分类</span>
@@ -105,6 +110,33 @@
           <button class="cat" type="button" data-cuisine="西餐">西餐</button>
           <button class="cat" type="button" data-cuisine="日式">日式</button>
           <button class="cat" type="button" data-cuisine="韩式">韩式</button>
+        </nav>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">耗时</span>
+        <nav class="recipes__cats" id="times">
+          <button class="cat cat--active" type="button" data-time="all">不限</button>
+          <button class="cat" type="button" data-time="20">≤20 分钟</button>
+          <button class="cat" type="button" data-time="40">≤40 分钟</button>
+          <button class="cat" type="button" data-time="41">40 分钟以上</button>
+        </nav>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">口味</span>
+        <nav class="recipes__cats" id="flavors">
+          <button class="cat cat--active" type="button" data-flavor="不限">不限</button>
+          <button class="cat" type="button" data-flavor="辣">辣</button>
+          <button class="cat" type="button" data-flavor="清淡">清淡</button>
+          <button class="cat" type="button" data-flavor="酸甜">酸甜</button>
+          <button class="cat" type="button" data-flavor="咸鲜">咸鲜</button>
+        </nav>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">难度</span>
+        <nav class="recipes__cats" id="levels">
+          <button class="cat cat--active" type="button" data-level="不限">不限</button>
+          <button class="cat" type="button" data-level="简单">简单</button>
+          <button class="cat" type="button" data-level="中等">中等</button>
         </nav>
       </div>
     </div>
@@ -144,6 +176,35 @@
       <button id="btn-next" class="cooking__next" type="button">下一步 →</button>
     </footer>
   </section>
+
+  <!-- 今日灵感老虎机弹窗 -->
+  <div id="modal-mask" class="modal-mask" hidden>
+    <div class="modal" id="slot-modal" hidden>
+      <div class="modal__head">
+        <h3 class="modal__title">🎲 今日灵感</h3>
+        <button class="modal__close" data-close type="button">✕</button>
+      </div>
+      <div class="slot__stage" id="slot-stage">
+        <div class="slot__emoji" id="slot-emoji">🍳</div>
+        <div class="slot__name" id="slot-name">…</div>
+        <div class="slot__meta" id="slot-meta">正在为你摇一道菜…</div>
+      </div>
+      <div class="modal__actions">
+        <button class="btn-back" id="btn-slot-again" type="button">再抽一次 🎲</button>
+        <button class="btn-start btn-start--modal" id="btn-slot-go" type="button">查看菜谱 →</button>
+      </div>
+    </div>
+
+    <div class="modal modal--wide" id="fridge-modal" hidden>
+      <div class="modal__head">
+        <h3 class="modal__title">🧊 冰箱找菜</h3>
+        <button class="modal__close" data-close type="button">✕</button>
+      </div>
+      <p class="fridge__hint">勾选家里现有的食材，看看现在就能做什么：</p>
+      <div class="fridge__chips" id="fridge-chips"></div>
+      <div class="fridge__results" id="fridge-results"></div>
+    </div>
+  </div>
 
   <!-- 全局提示 -->
   <div id="toast" class="toast" role="status"></div>
