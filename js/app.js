@@ -80,7 +80,7 @@ const RECIPES = [
     tips: ["锅边淋油才有金黄酥脆的锅巴", "关火后的 5 分钟焖制别开盖，米饭才透", "腊味自带咸味，调味汁别做太咸"]
   },
   {
-    id: 6, name: "日式豚骨拉面", cat: "主食", cuisine: "日韩",
+    id: 6, name: "日式豚骨拉面", cat: "主食", cuisine: "日式",
     time: "60 分钟", level: "中等", servings: "1 人份", img: "assets/images/recipe-5.jpg",
     ingredients: ["拉面 生面 1 份", "豚骨汤底或浓高汤 500ml", "叉烧肉 3 片", "溏心蛋 半个", "木耳丝 适量", "葱花 适量", "海苔 1 片", "味噌 1 勺", "日式酱油 1 勺"],
     steps: [
@@ -94,7 +94,7 @@ const RECIPES = [
     tips: ["碗先用开水烫热，汤才不容易凉", "面煮到八九分即可，入汤后还会继续变软"]
   },
   {
-    id: 7, name: "三文鱼波奇碗", cat: "快手菜", cuisine: "日韩",
+    id: 7, name: "三文鱼波奇碗", cat: "快手菜", cuisine: "日式",
     time: "15 分钟", level: "简单", servings: "1 人份", img: "assets/images/recipe-7.jpg",
     ingredients: ["刺身级三文鱼 150g", "热米饭 1 碗", "牛油果 半个", "黄瓜 半根", "生抽 1 勺", "芝麻油 几滴", "白芝麻 1 小勺", "海苔碎 适量"],
     steps: [
@@ -108,7 +108,7 @@ const RECIPES = [
     tips: ["三文鱼务必购买刺身级，普通生食有风险", "米饭稍晾再码料，避免把鱼烫熟影响口感"]
   },
   {
-    id: 8, name: "川香孜然烤串", cat: "家常菜", cuisine: "川湘",
+    id: 8, name: "川香孜然烤串", cat: "家常菜", cuisine: "川菜",
     time: "45 分钟", level: "中等", servings: "2-3 人份", img: "assets/images/recipe-6.jpg",
     ingredients: ["羊腿肉或鸡腿肉 400g", "洋葱 半个", "孜然粉 2 勺", "辣椒粉 1 勺", "白芝麻 1 勺", "生抽 1 勺", "食用油 1 勺", "盐 适量"],
     steps: [
@@ -120,6 +120,34 @@ const RECIPES = [
       "撒剩余孜然粉、辣椒粉、白芝麻，再烤 5 分钟出炉。"
     ],
     tips: ["竹签泡过水才不会被烤糊", "孜然辣椒最后撒，早撒容易糊发苦", "没有烤箱用平底锅高火煎，一样焦香"]
+  },
+  {
+    id: 9, name: "农家小炒肉", cat: "家常菜", cuisine: "湘菜",
+    time: "25 分钟", level: "简单", servings: "2 人份", img: null, emoji: "🌶️",
+    ingredients: ["五花肉 300g", "螺丝椒或青辣椒 5 根", "大蒜 4 瓣", "豆豉 1 小勺", "生抽 1 勺", "老抽 几滴", "盐 适量"],
+    steps: [
+      "五花肉切 2mm 薄片，青椒斜刀切圈，蒜切片。",
+      "干锅不放油，下青椒中火干煸至起虎皮，盛出。",
+      "锅中少油，下五花肉中小火煸出油脂，至边缘微焦。",
+      "下蒜片、豆豉炒香。",
+      "淋生抽、几滴老抽上色炒匀。",
+      "倒回青椒，大火翻炒 1 分钟，加盐调味出锅。"
+    ],
+    tips: ["青椒先干煸出虎皮，香味才出得来", "这道菜的灵魂是五花肉煸出的猪油，别把油全倒掉", "豆豉要小火炒，炒糊会发苦"]
+  },
+  {
+    id: 10, name: "韩式石锅拌饭", cat: "主食", cuisine: "韩式",
+    time: "35 分钟", level: "简单", servings: "1-2 人份", img: null, emoji: "🍲",
+    ingredients: ["米饭 1 碗", "鸡蛋 1 个", "菠菜 100g", "黄豆芽 100g", "胡萝卜 半根", "香菇 2 朵", "牛肉末 80g", "韩式辣酱 2 勺", "香油 1 勺", "白芝麻 少许"],
+    steps: [
+      "菠菜、豆芽分别焯水，捞出拌少许盐和香油。",
+      "胡萝卜、香菇切丝，少油炒软；牛肉末炒熟调味。",
+      "石锅（或砂锅）内壁刷一层香油，倒入米饭。",
+      "蔬菜和牛肉按颜色码在米饭上，中间放一个煎蛋。",
+      "小火加热 3-4 分钟，听到滋滋声说明锅巴形成了。",
+      "加韩式辣酱、撒白芝麻，拌匀趁热吃。"
+    ],
+    tips: ["锅底香油要刷足，才有金黄酥脆的锅巴", "没有石锅用铸铁锅或砂锅代替", "辣酱里加少许雪碧或糖，口感更顺"]
   },
 ];
 
@@ -164,7 +192,9 @@ function renderRecipes() {
       (r, i) => `
       <article class="recipe-card" style="animation-delay:${i * 0.07}s" data-id="${r.id}">
         <div class="recipe-card__img">
-          <img src="${r.img}" alt="${r.name}" loading="lazy" />
+          ${r.img
+            ? `<img src="${r.img}" alt="${r.name}" loading="lazy" />`
+            : `<div class="img-placeholder"><span class="img-placeholder__emoji">${r.emoji || "🍽"}</span><span class="img-placeholder__text">图片待补</span></div>`}
           <span class="recipe-card__badge">${r.cat}</span>
         </div>
         <div class="recipe-card__body">
@@ -211,7 +241,9 @@ function openDetail(id) {
   $("#detail-body").innerHTML = `
     <div class="detail__hero">
       <div class="polaroid polaroid--detail">
-        <div class="photo"><img src="${r.img}" alt="${r.name}" /></div>
+        <div class="photo">${r.img
+          ? `<img src="${r.img}" alt="${r.name}" />`
+          : `<div class="img-placeholder"><span class="img-placeholder__emoji">${r.emoji || "🍽"}</span><span class="img-placeholder__text">图片待补</span></div>`}</div>
       </div>
     </div>
     <div class="detail__info">

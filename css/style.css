@@ -486,6 +486,28 @@ body {
   color: var(--muted);
 }
 
+/* 无图菜谱的占位样式（图片后续补充） */
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f6ecd9 0%, #efe0c4 55%, #f3e7cf 100%);
+}
+.img-placeholder__emoji {
+  font-size: 56px;
+  filter: saturate(0.85);
+  animation: floatY 5s ease-in-out infinite;
+}
+.img-placeholder__text {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #b3a582;
+}
+
 .recipe-card {
   background: #ffffff;
   padding: 12px 12px 14px;
