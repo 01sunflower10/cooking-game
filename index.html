@@ -78,20 +78,47 @@
       <button id="btn-back" class="btn-back" type="button" title="返回首页">返回首页</button>
     </header>
 
-    <nav class="recipes__cats" id="cats">
-      <button class="cat cat--active" type="button" data-cat="全部">全部</button>
-      <button class="cat" type="button" data-cat="家常菜">家常菜</button>
-      <button class="cat" type="button" data-cat="快手菜">快手菜</button>
-      <button class="cat" type="button" data-cat="汤羹粥品">汤羹粥品</button>
-      <button class="cat" type="button" data-cat="主食">主食</button>
-      <button class="cat" type="button" data-cat="甜品">甜品</button>
-    </nav>
+    <div class="recipes__filters">
+      <div class="filter-group">
+        <span class="filter-label">分类</span>
+        <nav class="recipes__cats" id="cats">
+          <button class="cat cat--active" type="button" data-cat="全部">全部</button>
+          <button class="cat" type="button" data-cat="家常菜">家常菜</button>
+          <button class="cat" type="button" data-cat="快手菜">快手菜</button>
+          <button class="cat" type="button" data-cat="汤羹粥品">汤羹粥品</button>
+          <button class="cat" type="button" data-cat="主食">主食</button>
+          <button class="cat" type="button" data-cat="甜品">甜品</button>
+        </nav>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">菜系</span>
+        <nav class="recipes__cats" id="cuisines">
+          <button class="cat cat--active" type="button" data-cuisine="不限">不限</button>
+          <button class="cat" type="button" data-cuisine="家常菜">家常菜</button>
+          <button class="cat" type="button" data-cuisine="川湘">川湘</button>
+          <button class="cat" type="button" data-cuisine="粤菜">粤菜</button>
+          <button class="cat" type="button" data-cuisine="江浙">江浙</button>
+          <button class="cat" type="button" data-cuisine="西餐">西餐</button>
+          <button class="cat" type="button" data-cuisine="日韩">日韩</button>
+        </nav>
+      </div>
+    </div>
 
     <main class="recipes__grid" id="recipe-grid">
       <!-- 卡片由 js/app.js 渲染 -->
     </main>
 
-    <footer class="recipes__footer">食光机 · 框架版本 v0.1 · 菜谱详情页即将上线</footer>
+    <footer class="recipes__footer">食光机 · 框架版本 v0.1 · 做菜模式即将上线</footer>
+  </section>
+
+  <!-- ========== 第三屏：菜谱详情 ========== -->
+  <section id="screen-detail" class="screen detail">
+    <header class="detail__header">
+      <button id="btn-detail-back" class="btn-back" type="button">← 返回列表</button>
+    </header>
+    <div class="detail__body" id="detail-body">
+      <!-- 详情内容由 js/app.js 渲染 -->
+    </div>
   </section>
 
   <!-- 全局提示 -->
