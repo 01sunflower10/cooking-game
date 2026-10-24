@@ -10,6 +10,35 @@ $("#btn-mine-back").addEventListener("click", () => {
   switchScreen(mineScreen, recipesScreen);
 });
 
+// 数据统计（第四组：本月/累计/最常做 TOP3/省钱估算）
+function renderStatsHtml() {
+  if (!timeline.length) return "";
+  const month = fmtDate(new Date()).slice(0, 7); // YYYY-MM
+  const monthCount = timeline.filter((t) => t.date.startsWith(month)).length;
+  const counts = {};
+  timeline.forEach((t) => (counts[t.id] = (counts[t.id] || 0) + 1));
+  const top = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([id, n]) => {
+      const r = RECIPES.find((x) => x.id === Number(id));
+      return `<b>${r ? r.name : "已下架的菜"}</b> ×${n}`;
+    })
+    .join("、");
+  // 粗略估算：一餐外卖均价 30 元，自己做食材成本约 15 元
+  const saved = timeline.length * 15;
+
+  return `<div class="mine__section">
+    <h3 class="mine__section-title">📊 数据统计 <small>每一顿亲手做的饭都算数</small></h3>
+    <div class="stat-chips">
+      <div class="stat-chip"><span class="stat-chip__num">${monthCount}<small>顿</small></span><span class="stat-chip__label">本月做饭</span></div>
+      <div class="stat-chip"><span class="stat-chip__num">${timeline.length}<small>顿</small></span><span class="stat-chip__label">累计下厨</span></div>
+      <div class="stat-chip"><span class="stat-chip__num">¥${saved}</span><span class="stat-chip__label">比外卖约省（按30元/餐估算）</span></div>
+    </div>
+    <p class="stat-top">最常做：${top}</p>
+  </div>`;
+}
+
 function renderMine() {
   const streak = cookStreak();
   const streakHtml = streak >= 2
@@ -56,6 +85,7 @@ function renderMine() {
     .join("");
 
   $("#mine-body").innerHTML = `
+    ${renderStatsHtml()}
     <div class="mine__section">
       <h3 class="mine__section-title">❤️ 收藏夹 <small>想吃的都在这</small></h3>
       ${favs.length ? `<div class="mine__fav-grid">${favCards}</div>` : `<div class="mine__empty">还没有收藏～<br/>点菜谱卡片右上角的 🤍 收起来</div>`}
@@ -87,7 +117,7 @@ $("#mine-body").addEventListener("click", (e) => {
     const pos = arr.indexOf(idx);
     pos >= 0 ? arr.splice(pos, 1) : arr.push(idx);
     planChecked[pid] = arr;
-    savePlanChecked();
+    savePlanChecked(Number(pid), idx, pos < 0);
     ing.classList.toggle("checked");
     return;
   }

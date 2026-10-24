@@ -104,6 +104,7 @@ function openDetail(id, from) {
         <button class="btn-start btn-start--detail" id="btn-cook" type="button">开始做菜 🔥</button>
         <button class="btn-plan${plans.includes(r.id) ? " on" : ""}" id="btn-plan" type="button">${plans.includes(r.id) ? "✓ 已在采购计划" : "🛒 加入采购计划"}</button>
       </div>
+      ${r.custom ? `<button class="btn-del-recipe" id="btn-del-recipe" type="button">🗑 删除这道自定义菜谱</button>` : ""}
     </div>`;
 
   lastListScreen = from || recipesScreen;
@@ -368,13 +369,12 @@ $("#record-star-row").addEventListener("click", (e) => {
 });
 
 $("#btn-record-save").addEventListener("click", () => {
-  timeline.push({
+  pushTimeline({
     id: cookRecipe.id,
     date: fmtDate(new Date()),
     rating: recordRating,
     note: $("#record-note").value.trim(),
   });
-  saveTimeline();
   closeModal();
   closeCooking();
   const streak = cookStreak();
@@ -382,8 +382,7 @@ $("#btn-record-save").addEventListener("click", () => {
 });
 
 $("#btn-record-skip").addEventListener("click", () => {
-  timeline.push({ id: cookRecipe.id, date: fmtDate(new Date()), rating: 0, note: "" });
-  saveTimeline();
+  pushTimeline({ id: cookRecipe.id, date: fmtDate(new Date()), rating: 0, note: "" });
   closeModal();
   closeCooking();
   showToast("已记入时光轴 📖");

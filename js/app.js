@@ -278,3 +278,7 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     }
   })();
 }
+
+// ---------- 初始化 ----------
+renderRecipes(); // 首屏渲染（数据就绪后再刷一次，让收藏心形等状态正确）
+document.addEventListener("store-ready", () => renderRecipes());

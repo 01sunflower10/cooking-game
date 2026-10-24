@@ -1,0 +1,111 @@
+/* ========== 第四组：上传菜谱 / 分享卡片 / 数据统计 ========== */
+
+/* 上传表单 */
+.upl { display: flex; flex-direction: column; gap: 18px; }
+.upl__row { display: flex; flex-direction: column; gap: 8px; }
+.upl__row--grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.upl__label { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--muted); }
+.upl__input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14.5px;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+}
+.upl__input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+.upl__emojis { display: flex; flex-wrap: wrap; gap: 8px; }
+.upl__emoji {
+  width: 42px;
+  height: 42px;
+  font-size: 22px;
+  line-height: 1;
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.upl__emoji:hover { transform: scale(1.1); }
+.upl__emoji.on { background: var(--green-soft); border-color: var(--green); }
+.upl__file { font-size: 13.5px; color: var(--muted); }
+.upl__preview { width: 160px; height: 120px; border-radius: 10px; overflow: hidden; }
+.upl__preview img { width: 100%; height: 100%; object-fit: cover; }
+.upl__lines { display: flex; flex-direction: column; gap: 8px; }
+.upl__line { display: flex; gap: 8px; align-items: center; }
+.upl__line .upl__input { flex: 1; }
+.upl__line__del {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.upl__line__del:hover { color: #c0392b; background: rgba(192, 57, 43, 0.08); }
+.upl__add {
+  align-self: flex-start;
+  padding: 7px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--green);
+  background: var(--green-soft);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.upl__add:hover { background: var(--green); color: #fff; }
+
+/* 详情页：删除自定义菜谱 */
+.btn-del-recipe {
+  margin-top: 14px;
+  padding: 10px 22px;
+  font-size: 13.5px;
+  color: #c0392b;
+  background: transparent;
+  border: 1px dashed rgba(192, 57, 43, 0.5);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.btn-del-recipe:hover { background: rgba(192, 57, 43, 0.06); }
+
+/* 分享卡片 */
+.share__stage { text-align: center; }
+.share__stage img {
+  max-width: 100%;
+  max-height: 58vh;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(63, 90, 56, 0.2);
+}
+
+/* 我的食光：数据统计 */
+.stat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 128px;
+  padding: 14px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.stat-chip__num { font-size: 24px; font-weight: 800; color: var(--green); }
+.stat-chip__num small { font-size: 13px; font-weight: 600; color: var(--muted); margin-left: 2px; }
+.stat-chip__label { font-size: 12.5px; letter-spacing: 1px; color: var(--muted); }
+.stat-top { font-size: 14px; line-height: 1.9; color: var(--ink); }
+.stat-top b { color: var(--orange); }
