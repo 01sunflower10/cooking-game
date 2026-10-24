@@ -426,11 +426,11 @@ body {
   color: #fff;
 }
 
-/* 筛选器（分类 + 菜系，均可选） */
+/* 筛选器（分类/菜系/耗时/口味/难度，单列对齐） */
 .recipes__filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-  gap: 14px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   padding: 6px 0 26px;
 }
 
@@ -463,16 +463,18 @@ body {
 .tool-btn--primary:hover { box-shadow: 0 10px 22px rgba(242, 107, 58, 0.4); }
 .filter-group {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 14px;
 }
 .filter-label {
   flex: none;
+  width: 2.8em;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--muted);
+  line-height: 41px; /* 与 chips 首行等高，文字垂直居中 */
 }
 .recipes__cats {
   display: flex;
