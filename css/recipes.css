@@ -1,0 +1,270 @@
+/* 食光机 · 选菜谱页：筛选 / 卡片 / 快捷工具 */
+
+/* ========== 选菜谱页 ========== */
+.recipes {
+  overflow-y: auto;
+  padding: 0 6vw 40px;
+}
+
+.recipes__header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 0 16px;
+  background: linear-gradient(var(--bg) 78%, rgba(251, 244, 232, 0));
+}
+
+.recipes__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.recipes__brand-name {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.recipes__search {
+  flex: 1;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 12px 20px;
+  color: var(--muted);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.recipes__search:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px var(--green-soft);
+}
+.recipes__search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--ink);
+}
+.recipes__search input::placeholder { color: var(--muted); }
+
+.btn-back {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: transparent;
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-back:hover {
+  background: var(--green);
+  color: #fff;
+}
+
+/* 筛选器（分类/菜系/耗时/口味/难度，单列对齐） */
+.recipes__filters {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 6px 0 26px;
+}
+
+/* 快捷工具行 */
+.quick-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 2px 0 20px;
+}
+.tool-btn {
+  padding: 13px 26px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+  background: var(--bg-card);
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tool-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(79, 111, 70, 0.25); }
+.tool-btn--primary {
+  color: #fff;
+  background: var(--orange);
+  border-color: var(--orange);
+  box-shadow: 0 8px 18px rgba(242, 107, 58, 0.3);
+}
+.tool-btn--primary:hover { box-shadow: 0 10px 22px rgba(242, 107, 58, 0.4); }
+.filter-group {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.filter-label {
+  flex: none;
+  width: 2.8em;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--muted);
+  line-height: 41px; /* 与 chips 首行等高，文字垂直居中 */
+}
+.recipes__cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.cat {
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--ink);
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cat:hover { border-color: var(--green); color: var(--green); }
+.cat--active {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+/* 菜谱卡片 */
+.recipes__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 26px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 60px 0;
+  text-align: center;
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+/* 无图菜谱的占位样式（图片后续补充） */
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f6ecd9 0%, #efe0c4 55%, #f3e7cf 100%);
+}
+.img-placeholder__emoji {
+  font-size: 56px;
+  filter: saturate(0.85);
+  animation: floatY 5s ease-in-out infinite;
+}
+.img-placeholder__text {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #b3a582;
+}
+
+.recipe-card {
+  background: #ffffff;
+  padding: 12px 12px 14px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(63, 90, 56, 0.12);
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  animation: cardIn 0.5s ease both;
+}
+.recipe-card:nth-child(even) { transform: rotate(0.9deg); }
+.recipe-card:nth-child(odd) { transform: rotate(-0.9deg); }
+.recipe-card:hover {
+  transform: translateY(-6px) rotate(0deg);
+  box-shadow: var(--shadow-card);
+}
+
+.recipe-card__img {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.recipe-card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.recipe-card:hover .recipe-card__img img { transform: scale(1.06); }
+
+.recipe-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(242, 107, 58, 0.92);
+  border-radius: 999px;
+  letter-spacing: 1px;
+}
+
+.recipe-card__body {
+  padding: 16px 6px 4px;
+}
+.recipe-card__name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.recipe-card__meta {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.recipe-card__btn {
+  width: 100%;
+  padding: 11px 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  background: var(--green-soft);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.recipe-card__btn:hover {
+  background: var(--green);
+  color: #fff;
+}
+
+.recipes__footer {
+  padding: 40px 0 10px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--muted);
+}

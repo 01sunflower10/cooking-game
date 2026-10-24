@@ -16,9 +16,20 @@ python -m http.server 8300
 ## 目录结构
 
 ```
-index.html          页面结构（欢迎页 + 选菜谱页）
-css/style.css       样式（米黄底 / 绿色主按钮 / 橙色品牌色 / 拍立得相框）
-js/app.js           逻辑（屏幕切换、菜谱数据、分类筛选、打字机气泡）
+index.html          入口页面（5 屏：欢迎 / 选菜谱 / 详情 / 做菜模式 / 我的食光）
+css/
+  base.css          设计变量、reset、屏幕切换、通用动画、Toast
+  welcome.css       欢迎页（拍立得、涂鸦、打字机气泡样式）
+  recipes.css       选菜谱页（筛选、卡片、快捷工具）
+  detail.css        菜谱详情页 + 做菜模式
+  modals.css        弹窗（今日灵感 / 冰箱找菜 / 做饭记录）
+  mine.css          我的食光（收藏/采购/时光轴）
+js/
+  data.js           菜谱数据 RECIPES + 口味/主料映射 + DOM 工具
+  store.js          localStorage 存储层（收藏/采购/时光轴）
+  app.js            屏幕切换、菜谱页筛选交互、Toast、弹窗、转盘、冰箱找菜
+  detail.js         菜谱详情页（份量换算）+ 做菜模式（计时/响铃/常亮）+ 做饭记录
+  mine.js           我的食光（收藏夹 / 采购清单 / 做饭时光轴）
 assets/images/      图片素材
 ```
 

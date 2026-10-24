@@ -1,0 +1,129 @@
+/* 食光机 · 基础样式：设计变量 / reset / 屏幕切换 / 通用动画 / Toast / 全局响应式 */
+
+/* ========== 设计变量 ========== */
+:root {
+  --bg: #fbf4e8;            /* 米黄底色 */
+  --bg-card: #fffdf8;
+  --green: #4f6f46;          /* 主按钮绿 */
+  --green-dark: #3f5a38;
+  --green-soft: #e7efe2;
+  --orange: #f26b3a;         /* 品牌橙 */
+  --ink: #2f3a2b;            /* 近黑绿文字 */
+  --muted: #8b927f;
+  --line: #ece2cf;
+  --radius-lg: 48px;
+  --radius-md: 24px;
+  --radius-sm: 14px;
+  --shadow-card: 0 10px 30px rgba(63, 90, 56, 0.14);
+  --shadow-btn: 0 10px 22px rgba(79, 111, 70, 0.35);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Hiragino Sans GB", sans-serif;
+  background-color: var(--bg);
+  /* 极淡的纸张颗粒纹理 */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.25 0 0 0 0.05 0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ========== 屏幕切换 ========== */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.screen--active {
+  display: block;
+  opacity: 1;
+}
+
+
+/* ========== 通用动画 ========== */
+/* ========== 动画 ========== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes cardIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 48px;
+  transform: translate(-50%, 20px);
+  padding: 14px 28px;
+  background: rgba(47, 58, 43, 0.92);
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: 1px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 99;
+}
+.toast--show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+
+/* ========== 响应式 ========== */
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  .welcome.screen--active {
+    flex-direction: column;
+    position: static;
+  }
+  .welcome__left {
+    align-items: center;
+    text-align: center;
+    padding: 8vh 8vw 4vh;
+  }
+  .welcome__right {
+    flex: none;
+    width: 100%;
+    height: auto;
+    padding: 0 6vw 6vw;
+  }
+  .photo { aspect-ratio: 4 / 3; }
+  .doodle--egg { display: none; }
+  .recipes { position: static; }
+  .recipes__header { flex-wrap: wrap; }
+}
+
+@media (max-width: 420px) {
+  .btn-start {
+    width: 100%;
+    justify-content: center;
+    padding: 16px 20px;
+  }
+  .welcome__points { gap: 8px; }
+  .welcome__points li { padding: 7px 12px; font-size: 12.5px; }
+  .welcome__title { letter-spacing: 4px; }
+}
+
+/* 无障碍：系统开启"减少动态效果"时关闭所有动画 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

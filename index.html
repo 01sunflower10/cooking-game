@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>食光机 · 发现你的每日灵感菜单</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/welcome.css" />
+  <link rel="stylesheet" href="css/recipes.css" />
+  <link rel="stylesheet" href="css/detail.css" />
+  <link rel="stylesheet" href="css/modals.css" />
+  <link rel="stylesheet" href="css/mine.css" />
 </head>
 <body>
 
@@ -237,6 +242,11 @@
   <!-- 全局提示 -->
   <div id="toast" class="toast" role="status"></div>
 
+  <!-- 依赖顺序：数据 → 存储 → 页面逻辑（详情/我的食光 在 app 通用层之后） -->
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/detail.js"></script>
+  <script src="js/mine.js"></script>
 </body>
 </html>
