@@ -291,11 +291,53 @@ $("#search-input").addEventListener("keydown", (e) => {
 
 // ---------- 菜谱详情页 ----------
 let detailRecipe = null;
+let detailScale = 1; // 相对菜谱原方的倍数
+
+// 解析菜谱基准人数："2-3 人份" → 2
+function baseServings(servings) {
+  const m = servings.match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : 1;
+}
+
+// 按倍数换算食材文本里的用量："番茄 2 个"×2 → "番茄 4 个"；"半个"→"1 个"；"盐 适量"不变
+function scaleIngredient(text, scale) {
+  if (scale === 1) return text;
+  return text.replace(
+    /(半|(\d+(?:\.\d+)?))\s*(小勺|大勺|kg|毫升|ml|克|g|个|片|瓣|勺|根|颗|只|条|块|碗|份)/g,
+    (m, num, digit, unit) => {
+      const v = num === "半" ? 0.5 : parseFloat(digit);
+      let nv = Math.round(v * scale * 10) / 10;
+      const ns = String(nv).replace(/\.0$/, "");
+      return ns + unit;
+    }
+  );
+}
+
+function renderIngredientList(r, scale) {
+  return `<ul class="ing-list">
+    ${r.ingredients.map((ing) => `<li class="ing"><span class="ing__box"></span><span class="ing__name">${scaleIngredient(ing, scale)}</span></li>`).join("")}
+  </ul>`;
+}
+
+function renderServingButtons(r) {
+  const base = baseServings(r.servings);
+  const opts = [
+    { scale: 1, label: `原方（${r.servings}）` },
+    { scale: 2 / base, label: "2 人份" },
+    { scale: 4 / base, label: "4 人份" },
+    { scale: 6 / base, label: "6 人份" },
+  ].filter((o, i, arr) => arr.findIndex((x) => x.scale === o.scale) === i); // 与原方同倍数的选项去重
+  return `<div class="detail__servings">
+    <span class="filter-label">份量</span>
+    ${opts.map((o) => `<button class="serving-btn${Math.abs(o.scale - detailScale) < 0.01 ? " serving-btn--active" : ""}" data-scale="${o.scale}" type="button">${o.label}</button>`).join("")}
+  </div>`;
+}
 
 function openDetail(id) {
   const r = RECIPES.find((x) => x.id === id);
   if (!r) return;
   detailRecipe = r;
+  detailScale = 1;
 
   $("#detail-body").innerHTML = `
     <div class="detail__hero">
@@ -317,11 +359,11 @@ function openDetail(id) {
         <span class="meta-chip">🍽 ${r.servings}</span>
       </div>
 
+      ${renderServingButtons(r)}
+
       <div class="detail__card">
         <h3 class="detail__section-title">🧺 食材清单<small>点击勾选，备料时逐项确认</small></h3>
-        <ul class="ing-list">
-          ${r.ingredients.map((ing) => `<li class="ing"><span class="ing__box"></span><span class="ing__name">${ing}</span></li>`).join("")}
-        </ul>
+        ${renderIngredientList(r, detailScale)}
       </div>
 
       <div class="detail__card">
@@ -343,8 +385,16 @@ function openDetail(id) {
   detailScreen.scrollTop = 0;
 }
 
-// 详情页交互：食材勾选 + 做菜按钮占位
+// 详情页交互：份量换算 + 食材勾选 + 做菜按钮
 $("#detail-body").addEventListener("click", (e) => {
+  const sBtn = e.target.closest(".serving-btn");
+  if (sBtn) {
+    detailScale = parseFloat(sBtn.dataset.scale);
+    // 只重渲染份量条与食材清单，避免整页重建跳动
+    document.querySelector(".detail__servings").outerHTML = renderServingButtons(detailRecipe);
+    document.querySelector(".detail__card .ing-list").outerHTML = renderIngredientList(detailRecipe, detailScale);
+    return;
+  }
   const ing = e.target.closest(".ing");
   if (ing) {
     ing.classList.toggle("checked");
