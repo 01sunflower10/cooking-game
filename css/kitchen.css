@@ -38,13 +38,13 @@
   96% { transform: scaleY(0.1); }
 }
 #kChef { animation: chefBob 2.6s ease-in-out infinite; }
-#kHead { animation: headBob 3.2s ease-in-out infinite; transform-box: view-box; transform-origin: 560px 190px; }
+#kHead { animation: headBob 3.2s ease-in-out infinite; transform-box: view-box; transform-origin: 560px 200px; }
 #kEyes { animation: blink 4.2s infinite; transform-box: fill-box; transform-origin: center; }
 
 /* 手臂旋转基点（肩膀） */
 #kArmL, #kArmR { transform-box: view-box; }
-#kArmL { transform-origin: 520px 214px; }
-#kArmR { transform-origin: 600px 214px; }
+#kArmL { transform-origin: 512px 226px; }
+#kArmR { transform-origin: 608px 226px; }
 
 /* ---------- 姿态：待机 ---------- */
 .kitchen--idle #kArmL { transform: rotate(6deg); }
@@ -117,7 +117,7 @@
 .kitchen--season .sp { animation: seasonFall 0.75s ease-in infinite; transform-box: fill-box; }
 
 /* ---------- 姿态：装盘庆祝 ---------- */
-.plate-group { transform: translateX(60px); opacity: 0; transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease; }
+.plate-group { transform: translateX(-60px); opacity: 0; transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease; }
 .kitchen--celebrate .plate-group { transform: translateX(0); opacity: 1; }
 @keyframes starPop {
   0% { transform: scale(0) rotate(0deg); opacity: 0; }
