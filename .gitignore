@@ -9,3 +9,8 @@ desktop.ini
 
 # 后端依赖（npm install 自动生成，不入库）
 server/node_modules/
+# 打包产物与中间物
+食光机.exe
+server/node-official.exe
+server/sea-prep.blob
+server/exe-log.txt

@@ -1,15 +1,28 @@
 // 食光机后端：Express + MySQL
 // 接口约定：全量同步（单人本地使用，简单可靠）
+
+// SEA 打包（exe）模式：入口脚本的 require 是受限加载器，切换为基于 exe 目录的真实解析
+const __isExe = (() => { try { return require("node:sea").isSea(); } catch { return false; } })();
+if (__isExe) {
+  const { createRequire } = require("node:module");
+  require = createRequire(__filename); // eslint-disable-line no-global-assign
+}
+
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const { exec } = require("child_process");
 const db = require("./db");
+
+// exe 模式：BASE = 项目根（exe 在 server/ 目录）；开发模式：server 的上级
+const BASE = __isExe ? path.dirname(path.dirname(process.execPath)) : path.dirname(__dirname);
+const SRV = __isExe ? path.dirname(process.execPath) : path.join(BASE, "server");
 
 const app = express();
 app.use(express.json({ limit: "10mb" })); // 图片走 base64，放宽限制
 
 // ---------- 自定义菜谱（第四组） ----------
-const uploadsDir = path.join(__dirname, "uploads");
+const uploadsDir = path.join(SRV, "uploads");
 fs.mkdirSync(uploadsDir, { recursive: true });
 
 function rowToRecipe(row) {
@@ -191,11 +204,14 @@ app.post("/api/timeline", async (req, res) => {
 
 // ---------- 静态托管前端（屏蔽 server 目录自身） ----------
 app.use("/server", (req, res) => res.status(403).end("Forbidden"));
-app.use(express.static(path.join(__dirname, "..")));
+app.use(express.static(BASE));
 
 const PORT = 3000;
 app.listen(PORT, async () => {
   console.log(`食光机已启动: http://127.0.0.1:${PORT}`);
+  if (__isExe) {
+    exec("start http://127.0.0.1:" + PORT);
+  }
   try {
     await db.query("SELECT 1");
     console.log("数据库连接正常 ✓");
