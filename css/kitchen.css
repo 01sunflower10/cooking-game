@@ -1,0 +1,144 @@
+/* ========== 模拟做饭：SVG 厨房场景 ========== */
+.kitchen-wrap {
+  flex: 0 0 auto;
+  padding: 4px 20px 0;
+}
+.kitchen-wrap svg {
+  display: block;
+  width: 100%;
+  max-height: 34vh;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* 做菜模式整体布局收紧，给场景让空间 */
+.cooking__main--kitchen { gap: 10px; padding-top: 2px; }
+.cooking__main--kitchen .cooking__text {
+  font-size: clamp(17px, 2.2vw, 28px);
+  line-height: 1.7;
+}
+.cooking__main--kitchen .cooking__num {
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+}
+.cooking__main--kitchen .cook-timer__big { font-size: clamp(42px, 6vw, 66px); }
+
+/* ---------- 通用待机 ---------- */
+@keyframes chefBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes headBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(2deg); }
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+#kChef { animation: chefBob 2.6s ease-in-out infinite; }
+#kHead { animation: headBob 3.2s ease-in-out infinite; transform-box: view-box; transform-origin: 560px 190px; }
+#kEyes { animation: blink 4.2s infinite; transform-box: fill-box; transform-origin: center; }
+
+/* 手臂旋转基点（肩膀） */
+#kArmL, #kArmR { transform-box: view-box; }
+#kArmL { transform-origin: 520px 214px; }
+#kArmR { transform-origin: 600px 214px; }
+
+/* ---------- 姿态：待机 ---------- */
+.kitchen--idle #kArmL { transform: rotate(6deg); }
+.kitchen--idle #kArmR { transform: rotate(-6deg); }
+
+/* ---------- 姿态：切配 ---------- */
+@keyframes chop {
+  0%, 100% { transform: rotate(24deg); }
+  50% { transform: rotate(52deg); }
+}
+.kitchen--cutting #kArmR { animation: chop 0.3s ease-in-out infinite; }
+.kitchen--cutting #kArmL { transform: rotate(28deg); }
+.kitchen--cutting #kKnife { opacity: 1 !important; }
+@keyframes vegSquish {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.55) scaleX(1.15); }
+}
+.kitchen--cutting #kVeg { animation: vegSquish 0.3s ease-in-out infinite; transform-box: fill-box; transform-origin: center bottom; }
+
+/* ---------- 姿态：翻炒 ---------- */
+@keyframes stir {
+  0%, 100% { transform: rotate(-38deg); }
+  50% { transform: rotate(-16deg); }
+}
+@keyframes potShake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-3px, 1px) rotate(-1.2deg); }
+  75% { transform: translate(3px, -1px) rotate(1.2deg); }
+}
+@keyframes foodToss {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+.kitchen--stirfry #kArmR { animation: stir 0.32s ease-in-out infinite; }
+.kitchen--stirfry #kArmL { transform: rotate(-58deg); }
+.kitchen--stirfry #kSpatula { opacity: 1 !important; }
+.kitchen--stirfry #kPot { animation: potShake 0.36s ease-in-out infinite; transform-box: view-box; transform-origin: 460px 290px; }
+.kitchen--stirfry #kFood { animation: foodToss 0.36s ease-in-out infinite; }
+/* 快蒸汽 */
+.kitchen--stirfry .steam ellipse { opacity: 0.5; animation: steamRise 1.1s ease-out infinite; }
+.kitchen--stirfry .steam .s2 { animation-delay: 0.35s; }
+.kitchen--stirfry .steam .s3 { animation-delay: 0.7s; }
+
+/* ---------- 姿态：慢炖 ---------- */
+@keyframes steamRise {
+  0% { opacity: 0; transform: translateY(10px) scale(0.6); }
+  30% { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-52px) scale(1.35); }
+}
+.steam ellipse { opacity: 0; }
+.kitchen--stew .steam ellipse { animation: steamRise 3s ease-out infinite; }
+.kitchen--stew .steam .s2 { animation-delay: 1s; }
+.kitchen--stew .steam .s3 { animation-delay: 2s; }
+.kitchen--stew #kArmL { transform: rotate(14deg); }
+.kitchen--stew #kArmR { transform: rotate(-14deg); }
+
+/* ---------- 姿态：调味 ---------- */
+@keyframes sprinkle {
+  0%, 100% { transform: rotate(-118deg); }
+  50% { transform: rotate(-128deg); }
+}
+@keyframes seasonFall {
+  0% { opacity: 0; transform: translateY(-6px); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(48px); }
+}
+.kitchen--season #kArmR { animation: sprinkle 0.7s ease-in-out infinite; }
+.kitchen--season #kArmL { transform: rotate(10deg); }
+.kitchen--season #kSeason { opacity: 1 !important; }
+.kitchen--season .sp { animation: seasonFall 0.75s ease-in infinite; transform-box: fill-box; }
+
+/* ---------- 姿态：装盘庆祝 ---------- */
+.plate-group { transform: translateX(60px); opacity: 0; transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease; }
+.kitchen--celebrate .plate-group { transform: translateX(0); opacity: 1; }
+@keyframes starPop {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  60% { transform: scale(1.25) rotate(18deg); opacity: 1; }
+  100% { transform: scale(1) rotate(8deg); opacity: 1; }
+}
+.kitchen--celebrate .stars { opacity: 1; }
+.kitchen--celebrate .star { animation: starPop 0.5s ease-out backwards; transform-box: fill-box; transform-origin: center; }
+
+/* ---------- 火焰 ---------- */
+.flame { transform-box: view-box; transform-origin: 402px 300px; transition: opacity 0.4s ease; }
+.flame--off { opacity: 0; }
+.flame--low { opacity: 0.55; transform: scale(0.6); }
+.flame--big { opacity: 1; animation: flicker 0.24s ease-in-out infinite alternate; }
+@keyframes flicker {
+  from { transform: scale(1) scaleY(1); }
+  to { transform: scale(1.08) scaleY(1.28); }
+}
+
+/* ---------- 小屏适配 ---------- */
+@media (max-width: 700px) {
+  .kitchen-wrap svg { max-height: 30vh; }
+  .kitchen-wrap { padding: 2px 8px 0; }
+}

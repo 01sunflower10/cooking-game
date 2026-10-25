@@ -60,8 +60,8 @@ function openDetail(id, from) {
   $("#detail-body").innerHTML = `
     <div class="detail__hero">
       <div class="polaroid polaroid--detail">
-        <div class="photo">${r.img
-          ? `<img src="${r.img}" alt="${r.name}" />`
+        <div class="photo">${(r.imgDetail || r.img)
+          ? `<img src="${r.imgDetail || r.img}" alt="${r.name}" />`
           : `<div class="img-placeholder"><span class="img-placeholder__emoji">${r.emoji || "🍽"}</span><span class="img-placeholder__text">图片待补</span></div>`}</div>
       </div>
     </div>
@@ -176,6 +176,7 @@ function openCooking(r) {
   stepIndex = 0;
   renderCookStep();
   switchScreen(detailScreen, cookingScreen);
+  window.dispatchEvent(new CustomEvent("kitchen-reset", { detail: { recipe: r } }));
   requestWakeLock();
 }
 
@@ -188,6 +189,7 @@ function renderCookStep() {
   $("#cook-step-total").textContent = r.steps.length;
   $("#cook-num").textContent = stepIndex + 1;
   $("#cook-text").textContent = s;
+  window.dispatchEvent(new CustomEvent("kitchen-step", { detail: { text: s, recipe: r } }));
   $("#cook-progress").style.width = ((stepIndex + 1) / r.steps.length) * 100 + "%";
   $("#btn-prev").disabled = stepIndex === 0;
   $("#btn-next").textContent = stepIndex === r.steps.length - 1 ? "完成做菜 🎉" : "下一步 →";
@@ -323,6 +325,7 @@ function closeCooking() {
   releaseWakeLock();
   cookRecipe = null;
   switchScreen(cookingScreen, detailScreen);
+  window.dispatchEvent(new Event("kitchen-stop"));
 }
 
 $("#btn-prev").addEventListener("click", () => {

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/modals.css" />
   <link rel="stylesheet" href="css/mine.css" />
   <link rel="stylesheet" href="css/group4.css" />
+  <link rel="stylesheet" href="css/kitchen.css" />
 </head>
 <body>
 
@@ -174,7 +175,8 @@
       <div class="cooking__count"><span id="cook-step-now">1</span> / <span id="cook-step-total">-</span></div>
     </header>
     <div class="cooking__bar"><i id="cook-progress"></i></div>
-    <main class="cooking__main" id="cook-main">
+    <div class="kitchen-wrap" id="kitchen-wrap" aria-hidden="true"></div>
+    <main class="cooking__main cooking__main--kitchen" id="cook-main">
       <div class="cooking__num" id="cook-num">1</div>
       <p class="cooking__text" id="cook-text"></p>
       <div class="cook-timer" id="cook-timer" hidden></div>
@@ -338,5 +340,6 @@
   <script src="js/mine.js"></script>
   <script src="js/custom.js"></script>
   <script src="js/share.js"></script>
+  <script src="js/kitchen.js"></script>
 </body>
 </html>
