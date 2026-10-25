@@ -1,22 +1,24 @@
 // 食光机后端：Express + MySQL
 // 接口约定：全量同步（单人本地使用，简单可靠）
 
-// SEA 打包（exe）模式：入口脚本的 require 是受限加载器，切换为基于 exe 目录的真实解析
+// SEA 打包（exe）模式相关路径：自动适应 exe 位置（项目根或 server/ 目录均可）
 const __isExe = (() => { try { return require("node:sea").isSea(); } catch { return false; } })();
+const path = require("path");
+const fs = require("fs");
+const __exeDir = path.dirname(process.execPath);
+const __inSrv = __isExe && fs.existsSync(path.join(__exeDir, "config.json")); // 旁边有 config.json → 在 server/ 里
+const BASE = __isExe ? (__inSrv ? path.dirname(__exeDir) : __exeDir) : path.dirname(__dirname);
+const SRV = __isExe ? (__inSrv ? __exeDir : path.join(__exeDir, "server")) : path.join(BASE, "server");
+
+// SEA 入口脚本的 require 是受限加载器，切换为真实解析（基点 server/，可找到 node_modules）
 if (__isExe) {
   const { createRequire } = require("node:module");
-  require = createRequire(__filename); // eslint-disable-line no-global-assign
+  require = createRequire(path.join(SRV, "package.json")); // eslint-disable-line no-global-assign
 }
 
 const express = require("express");
-const path = require("path");
-const fs = require("fs");
 const { exec } = require("child_process");
 const db = require("./db");
-
-// exe 模式：BASE = 项目根（exe 在 server/ 目录）；开发模式：server 的上级
-const BASE = __isExe ? path.dirname(path.dirname(process.execPath)) : path.dirname(__dirname);
-const SRV = __isExe ? path.dirname(process.execPath) : path.join(BASE, "server");
 
 const app = express();
 app.use(express.json({ limit: "10mb" })); // 图片走 base64，放宽限制
