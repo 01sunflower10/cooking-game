@@ -144,7 +144,7 @@ const kitchen = (() => {
         <ellipse cx="636" cy="298" rx="80" ry="6" fill="rgba(0,0,0,0.08)"/>
         <rect x="558" y="282" width="156" height="14" rx="4" fill="#d9a86c"/>
         <rect x="558" y="282" width="156" height="14" rx="4" fill="none" stroke="#b5875a" stroke-width="2"/>
-        <g id="kVeg"><rect x="610" y="268" width="34" height="14" rx="7" fill="#e88a5e"/></g>
+        <g id="kVeg"><rect x="612" y="266" width="34" height="16" rx="7" fill="#e88a5e"/><rect x="604" y="274" width="10" height="8" rx="4" fill="#a8c686"/></g>
       </g>
 
       <!-- 调味瓶 -->
@@ -201,8 +201,8 @@ const kitchen = (() => {
           <path d="M612 228 q10 8 16 18" stroke="#fdfaf2" stroke-width="21" fill="none" stroke-linecap="round"/>
           <circle cx="642" cy="264" r="9" fill="#ffd9b8"/>
           <g id="kKnife" class="tool" opacity="0">
-            <rect x="636" y="266" width="10" height="30" rx="4" fill="#c8a06a" transform="rotate(40 641 273)"/>
-            <path d="M648 290 l34 -18 q6 8 -2 14 l-26 12 z" fill="#b8c0c8" transform="rotate(40 641 273)"/>
+            <rect x="624" y="250" width="12" height="22" rx="4" fill="#c8a06a"/>
+            <path d="M622 270 h16 v8 q0 14 -8 20 q-8 -6 -8 -20 z" fill="#8b959e" stroke="#6d767e" stroke-width="1.5"/>
           </g>
           <g id="kSpatula" class="tool" opacity="0">
             <rect x="638" y="268" width="9" height="46" rx="4" fill="#c8a06a" transform="rotate(-35 642 273)"/>

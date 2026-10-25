@@ -52,11 +52,11 @@
 
 /* ---------- 姿态：切配 ---------- */
 @keyframes chop {
-  0%, 100% { transform: rotate(24deg); }
-  50% { transform: rotate(52deg); }
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(20deg); }
 }
-.kitchen--cutting #kArmR { animation: chop 0.3s ease-in-out infinite; }
-.kitchen--cutting #kArmL { transform: rotate(28deg); }
+.kitchen--cutting #kArmR { animation: chop 0.34s ease-in-out infinite; }
+.kitchen--cutting #kArmL { transform: rotate(-6deg); }
 .kitchen--cutting #kKnife { opacity: 1 !important; }
 @keyframes vegSquish {
   0%, 100% { transform: scaleY(1); }
